@@ -18,9 +18,8 @@ export default function ProtectedPage() {
     }
     fetchData()
   }, [session])
- 
-
-  // If no session exists, display access denied message
+  console.log(session, 'la  session is')
+   // If no session exists, display access denied message
   if (!session) {
     return (
       <Layout>
@@ -34,6 +33,7 @@ export default function ProtectedPage() {
     <Layout>
       <h1>Protected Page</h1>
       <p>
+      <div>Access Token: {session.accessToken}</div>
         <strong>{content ?? "\u00a0"}</strong>
       </p>
     </Layout>

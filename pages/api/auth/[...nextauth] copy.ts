@@ -7,30 +7,28 @@ export const authOptions: NextAuthOptions = {
   // https://next-auth.js.org/configuration/providers/oauth
   providers: [
     GoogleProvider({
-      clientId: process.env.CLIENT_ID as any,
-      clientSecret: process.env.CLIENT_SECRET as any,
+      clientId: "",
+      clientSecret: "",
     }),
   ],
   theme: {
     colorScheme: "light",
   },
   callbacks: {
-    async session({ session, user, token }) {
-      if (!token.username){
-         session = {}
+    async jwt({token,account}){
+      if (account){
+          token.access_Token = 'pepe pepito '
       }
 
+      return {...token, ...account}
+    },  
+    async session({session,token ,user}){
+      console.log('------sesion------------------------------------------------')
+      session.user = token 
+
+      console.log(session.user)  
+
       return session
-    },
-    async jwt({ token, user, account, profile }) {
-        
-      console.log(token,"this is the token")
-       if (user) {
-        // consulta al back para que me de  ok  voy con el user
-         const name = 'Pepe Pompin'
-         token.username = name
-       }
-       return token
     }
   },
 }
