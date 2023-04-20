@@ -1,3 +1,4 @@
+import { log } from "console"
 import NextAuth, { NextAuthOptions } from "next-auth"
 import GoogleProvider from "next-auth/providers/google"
 
@@ -14,21 +15,37 @@ export const authOptions: NextAuthOptions = {
   theme: {
     colorScheme: "light",
   },
+  secret: process.env.CLIENT_SECRET,
   callbacks: {
     async session({ session, user, token }) {
-      if (!token.username){
+      // console.log("El token es: ", token.ok)
+      if ((!token.ok) || (token.ok != 200)){
          session = {}
+         return session
       }
-
+      session.accessToken = token.accessToken
       return session
     },
     async jwt({ token, user, account, profile }) {
-        
-      console.log(token,"this is the token")
+      console.log("Profile: ", JSON.stringify(profile))
        if (user) {
+         const ok = await fetch (
+          "http://localhost:8080/login", {
+            method: 'POST',
+            headers: {
+              Accept: 'application.json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profile),
+            cache: 'default'
+          })
         // consulta al back para que me de  ok  voy con el user
-         const name = 'Pepe Pompin'
-         token.username = name
+        token.ok = ok.status
+        console.log("Status: ", token.ok)
+        // console.log("Respuesta: ", ok.body)
+        const res = await ok.json()
+        console.log("Token: ", res.token)
+        token.accessToken = res.token
        }
        return token
     }
